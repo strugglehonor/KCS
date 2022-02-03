@@ -10,7 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/strugglehonor/KCS/internal/apiserver/store"
 	"github.com/strugglehonor/KCS/internal/config/db"
-	"github.com/strugglehonor/KCS/internal/pkg/log"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	ormLogger "gorm.io/gorm/logger"
@@ -33,6 +33,10 @@ func (ms *mysqlstore) Volume() store.VolumeStore {
 	return newVolume(ms)
 }
 
+func (ms *mysqlstore) Deployment() store.DeploymentStore {
+	return newDeployment(ms)
+}
+ 
 var (
 	once sync.Once
 	mysqlFactory store.Factory
@@ -103,7 +107,7 @@ func GetMySQLFactoryOr() (store.Factory, error) {
 				TablePrefix:   "t_", // 表名前缀
 				SingularTable: true, // 使用单数表名
 			},
-			Logger: NewDBlogger(*log.NewLogger(), logrus.DebugLevel),
+			Logger: NewDBlogger(*logrus.New(), logrus.DebugLevel),
 		})
 		mysqlFactory = &mysqlstore{db: dbConn}
 	})

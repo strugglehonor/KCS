@@ -6,6 +6,7 @@ type Factory interface {
 	Pod()  PodStore
 	Cluster()  ClusterStore
 	Volume() VolumeStore
+	Deployment() DeploymentStore
 }
 
 func Client() Factory {
