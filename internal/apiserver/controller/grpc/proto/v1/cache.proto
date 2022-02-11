@@ -1,0 +1,41 @@
+// Copyright zijian.su
+
+syntax = "proto3";
+
+package proto;
+option go_package = ".";
+
+//go:generate protoc -I . --experimental_allow_proto3_optional --go_out=plugins=grpc:. cache.proto
+
+service Cache {
+    rpc ListPods(ListPodsRequest) returns (ListPodsResponse) {}
+}
+
+message ListPodsRequest {
+    optional int64 offset = 1;
+    optional int64 limit = 2;
+}
+
+// PodsInfo contains Pod details
+message PodsInfo {
+    string ip = 1;
+    string name = 2;
+    string namespace = 3;
+    string node = 4;
+    string status = 5;
+    string creator = 6;
+    string restart_policy = 7;
+    string image_pull_policy = 8;
+    int32 mem_limit = 9;
+    int32 cpu_limit = 10;
+    int32 gpu_limit = 11;
+    int32 life_limit = 12;
+    bool host_ipc = 13;
+    bool host_network = 14;
+    bool host_pid = 15;
+}
+
+message ListPodsResponse {
+    int64 total_count = 1;
+    repeated PodsInfo items = 2;
+}
