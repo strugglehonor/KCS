@@ -1,12 +1,11 @@
 package model
 
-type Node struct {
-	IP   string  `json:"ip"`
-	NodeInfo  NodeInfo  `json:"node_info"`
-	Instance  string  `json:"instance"`
-}
+import "gorm.io/gorm"
 
-type NodeInfo struct {
-	CpuUsage  float32
-	MemUsage  float32
+type Node struct {
+	gorm.Model
+	IP   string  `json:"ip" gorm:"not null; type: varchar(20)"`
+	Instance  string  `json:"instance" gorm:"not null; type: varchar(32)"`
+	ClusterID uint `json:"cluster_id"`
+	PodID uint `json:"pod_id"`
 }

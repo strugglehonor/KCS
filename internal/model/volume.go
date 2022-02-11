@@ -1,8 +1,11 @@
 package model
 
+import "gorm.io/gorm"
+
 type Volume struct {
-	ID  string `gorm:"id, omitempty" json:"id"`
-	Name string `gorm:"name, omitempty" json:"name"`
-	VolumeType string `gorm:"volume_type, omitempty" json:"volume_type"`
-	MountPath string `gorm:"mount_path, omitempty" json:"mount_path"`
+	gorm.Model
+	PodID  uint  `json:"pod_id"`
+	Name string `gorm:"not null; type:varchar(20)" json:"name"`
+	VolumeType string `gorm:"not null; size:16" json:"volume_type"`
+	MountPath string `gorm:"not null; type:varchar(32)" json:"mount_path"`
 }
