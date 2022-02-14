@@ -4,7 +4,14 @@ import (
 	"context"
 
 	"github.com/strugglehonor/KCS/internal/apiserver/store"
+	redisConf "github.com/strugglehonor/KCS/internal/config/redis"
 	"github.com/strugglehonor/KCS/internal/model"
+	"github.com/strugglehonor/KCS/pkg/log"
+	"github.com/strugglehonor/KCS/pkg/redis"
+)
+
+var (
+	DeploymentChangedNotification = "deployment information changed"
 )
 
 type DeploymentSrv interface {
@@ -15,6 +22,7 @@ type DeploymentSrv interface {
 
 type DeploymentService struct {
 	store store.Factory
+	redisCli *redis.RedisCli
 }
 
 // 显示判断是否进行了接口
@@ -28,6 +36,13 @@ func (deploymentService *DeploymentService) Create(ctx context.Context, deployme
 	if err := deploymentService.store.Deployment().Create(ctx, deployment); err != nil {
 		return err
 	}
+
+	log.INFO.Printf("begin to publish %s to redis channal\n", DeploymentChangedNotification)
+	err := deploymentService.redisCli.Public(redisConf.RedisChannal, DeploymentChangedNotification)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

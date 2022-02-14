@@ -3,8 +3,13 @@ package v1
 import (
 	"context"
 
-	"github.com/strugglehonor/KCS/internal/model"
 	"github.com/strugglehonor/KCS/internal/apiserver/store"
+	"github.com/strugglehonor/KCS/internal/model"
+	"github.com/strugglehonor/KCS/pkg/redis"
+)
+
+var (
+	PodChangedNotification = "k8s pod changed notification" 
 )
 
 type PodSrv interface {
@@ -13,12 +18,13 @@ type PodSrv interface {
 	GetPodByName(ctx context.Context, podName string) (*model.Pod, error) 
 	InsertPod(ctx context.Context, ID, name, namespace, status, creator, restartPolicy,
 		imagePullPolicy, dnsPolicy, ip string, memLimit, cpulimit, gpulimit, lifelimit int32, env map[interface{}]interface{},
-		hostIPC, hostNetwork, hostPID bool, node model.Node, cluster model.Cluster) error
+		hostIPC, hostNetwork, hostPID bool, node model.Node, cluster *model.Cluster) error
 	Update(ctx context.Context, pod *model.Pod) error
 }
 
 type PodService struct {
 	store store.Factory
+	redisCli redis.RedisCli
 }
 
 var _ PodSrv = (*PodService)(nil)
@@ -53,20 +59,18 @@ func (podService *PodService) GetPodByName(ctx context.Context, podName string) 
 
 func (podService *PodService) InsertPod(ctx context.Context, ID, name, namespace, status, creator, restartPolicy,
     imagePullPolicy, dnsPolicy, ip string, memLimit, cpulimit, gpulimit, lifelimit int32, env map[interface{}]interface{},
-    hostIPC, hostNetwork, hostPID bool, node model.Node, cluster model.Cluster) error {
+    hostIPC, hostNetwork, hostPID bool, node model.Node, cluster *model.Cluster) error {
 	
 	pod := model.Pod{
-		ID: ID,
 		Ip: ip,
 		Name: name,
 		NameSpace: namespace,
 		Node: node,
 		Status: status,
-		Cluster: &cluster,
+		Cluster: cluster,
 		Creator: creator,
 		RestartPolicy: restartPolicy,
 		ImagePullPolicy: imagePullPolicy,
-		DNSPolicy: dnsPolicy,
 		MemLimit: memLimit,
 		CpuLimit: cpulimit,
 		GpuLimit: gpulimit,
