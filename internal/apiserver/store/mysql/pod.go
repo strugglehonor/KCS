@@ -41,3 +41,12 @@ func (p Pod) InsertPod(ctx context.Context, pod *model.Pod) error {
 func (p Pod) Update(ctx context.Context, pod *model.Pod) error {
 	return p.db.Save(pod).Error
 }
+
+func (p Pod) GetAllPod(ctx context.Context, limit, offset *int64) ([]*model.Pod, error) {
+	pods := []*model.Pod{}
+	if err :=  p.db.Limit(int(*limit)).Offset(int(*offset)).Find(pods).Error; err != nil {
+		return nil, err
+	}
+
+	return pods, nil
+}

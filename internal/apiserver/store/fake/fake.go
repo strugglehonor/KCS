@@ -37,7 +37,6 @@ func FakePod(count int) []*model.Pod {
 			NameSpace: random.RandomString(5),
 			Status: Pending,
 			Cluster: &model.Cluster{},
-			Volumes: FakeVolume(10),
 			Creator: fmt.Sprintf("creator_%d", i),
 			Name: fmt.Sprintf("name_%d", i),
 		})
@@ -61,7 +60,7 @@ func FakeCluster(count int) []*model.Cluster {
 		clusters = append(clusters, &model.Cluster{
 			KubeConfig: fmt.Sprintf("kubeconfig_%d", i),
 			Region: Beijing,
-			Nodes: []model.Node{},
+			Nodes: []*model.Node{},
 			Status: Pending,
 			Version: K8sVersion,
 		})
@@ -73,7 +72,7 @@ func FakeDeployment(count int) []*model.Deployment {
 	deployments := make([]*model.Deployment, 0)
 	for i:=0; i<count; i++ {
 		deployments = append(deployments, &model.Deployment{
-			Pod: FakePod(10),
+			
 		})
 	}
 	return deployments

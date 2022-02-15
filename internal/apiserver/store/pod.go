@@ -12,4 +12,5 @@ type PodStore interface {
 	GetPodByName(ctx context.Context, podName string) (*model.Pod, error)
 	InsertPod(ctx context.Context, pod *model.Pod) error
 	Update(ctx context.Context, pod *model.Pod) error
+	GetAllPod(ctx context.Context, limit, offset *int64) ([]*model.Pod, error) 
 }

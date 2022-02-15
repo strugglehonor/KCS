@@ -10,6 +10,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/strugglehonor/KCS/internal/apiserver/store"
 	"github.com/strugglehonor/KCS/internal/config/db"
+	"github.com/strugglehonor/KCS/internal/model"
+	"github.com/strugglehonor/KCS/pkg/log"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -39,7 +41,7 @@ func (ms *mysqlstore) Deployment() store.DeploymentStore {
  
 var (
 	once sync.Once
-	mysqlFactory store.Factory
+	mysqlFactory *mysqlstore
 )
 
 // mysql log
@@ -97,11 +99,12 @@ func NewDBlogger(Rawlogger logrus.Logger, level logrus.Level) *databaseLogger {
 	return l
 }
 
-func GetMySQLFactoryOr() (store.Factory, error) {
+func GetMySQLFactoryOr() (*mysqlstore, error) {
 	var dbConn *gorm.DB
 	var err error
+	log.INFO.Println("begin to connext mysql")
 	once.Do(func() {
-		dsn := fmt.Sprintf("%s:%s@tcp(%s:%v)/gorm?charset=%s", db.User, db.Passwd, db.Host, db.Port, db.Charset)
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=%s", db.User, db.Passwd, db.Host, db.Port, db.DBName, db.Charset)
 		dbConn, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 			NamingStrategy: schema.NamingStrategy{
 				TablePrefix:   "t_", // 表名前缀
@@ -116,5 +119,17 @@ func GetMySQLFactoryOr() (store.Factory, error) {
 		return nil, fmt.Errorf("failed to init db, failed to get mysqlStore, error message: %v", err)
 	}
 
+	log.INFO.Println("connect to mysql successfully")
 	return mysqlFactory, nil
 } 
+
+func AutoMigrate(mysqlstore *mysqlstore) error {
+	// err := mysqlstore.db.AutoMigrate(&model.Deployment{}, &model.Node{}, &model.Volume{}, &model.Cluster{}, &model.Pod{})
+	// err := mysqlstore.db.Migrator().DropTable(&model.Deployment{}, &model.Node{}, &model.Volume{}, &model.Cluster{}, &model.Pod{})
+	// if err != nil {
+	// 	return err
+	// }
+
+	err := mysqlstore.db.AutoMigrate(&model.Deployment{}, &model.Node{}, &model.Volume{}, &model.Cluster{}, &model.Pod{})
+	return err
+}
