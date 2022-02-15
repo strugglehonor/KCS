@@ -7,7 +7,7 @@ import (
 type Cluster struct {
 	gorm.Model  
 	KubeConfig   string  `gorm:"not null; type:varchar(32)" json:"kube_config"`
-	Nodes  []Node  `gorm:"not null;" json:"nodes"`
+	Nodes  []*Node  `gorm:"not null;" json:"nodes"`
 	Region string `gorm:"not null; size:32" json:"region"`
 	Description string `gorm:"type: varchar(1024)" json:"description"`
 	Status  string  `gorm:"not null; size:16" json:"status"`
